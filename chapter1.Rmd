@@ -1,13 +1,14 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
-
 ```{r}
 # This is a so-called "R chunk" where you can write R code.
 
 date()
-
+print('Hello, everyone!')
 ```
-The text continues here.
 
+I found this course while looking up the MOOC pages, and the subtitle sounded interesting. I'm quite familiar with R what comes to basic statistics and data mining, but with GitHub and the overall idea of sharing data I'm a total \emph{rookie}. I'm aiming to being more comfortable in open data environments and sharing my code with others. I'm also trying to keep my R skills up, since all my other courses are done with Matlab and Python at the moment.
+
+This is my GitHub repository:
+https://github.com/Pinjahainen/IODS-project
