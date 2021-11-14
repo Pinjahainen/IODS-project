@@ -8,7 +8,7 @@ date()
 print('Hello, everyone!')
 ```
 
-I found this course while looking up the MOOC pages, and the subtitle sounded interesting. I'm quite familiar with R what comes to basic statistics and data mining, but with GitHub and the overall idea of sharing data I'm a total \emph{rookie}. I'm aiming to being more comfortable in open data environments and sharing my code with others. I'm also trying to keep my R skills up, since all my other courses are done with Matlab and Python at the moment.
+I found this course while looking up the MOOC pages, and the subtitle sounded interesting. I'm quite familiar with R what comes to basic statistics and data mining, but with GitHub and the overall idea of sharing data I'm a complete rookie. I'm aiming to being more comfortable in open data environments and sharing my code with others. I'm also trying to keep my R skills up, since all my other courses are done with Matlab and Python at the moment.
 
 This is my GitHub repository:
 https://github.com/Pinjahainen/IODS-project

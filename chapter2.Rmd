@@ -1,8 +1,0 @@
-# Week 1 learning aspects
-
-
-```{r}
-date()
-```
-
-This week I've noticed I already had a GitHub account, and learned how to use it in RStudio (so far). 
