@@ -10,7 +10,7 @@ str(lrn14)
 # create column 'attitude' by scaling the column "Attitude"
 lrn14$attitude <- lrn14$Attitude/10
 
-library(dplyr)
+library(dplyr) 
 
 # questions related to deep, surface and strategic learning
 deep_questions <- c("D03", "D11", "D19", "D27", "D07", "D14", "D22", "D30","D06",  "D15", "D23", "D31")
