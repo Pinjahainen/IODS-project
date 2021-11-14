@@ -4,7 +4,7 @@
 lrn14 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt", sep="\t", header=TRUE)
 
 # the data
-dim(lrn14)
+dim(lrn14) 
 str(lrn14)
 
 # create column 'attitude' by scaling the column "Attitude"
