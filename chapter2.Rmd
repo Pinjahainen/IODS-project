@@ -1,0 +1,106 @@
+
+## Week 2: Regression and model validation
+
+```{r}
+learn <- read.table('data/learning2014.txt', sep ='', header = T)
+```
+
+```{r}
+# switch gender from F/M to 1/2
+learn$gender[learn$gender == 'F'] <- 1
+learn$gender[learn$gender == 'M'] <- 2
+learn$gender <- as.integer(learn$gender)
+
+str(learn)
+```
+The learn dataframe includes 166 observations and 7 variables. In addition to gender and age, we have scoring points and some other variables which are summary variables from learning 2014 -questionnary, which are defining the strength of different learning methods of different students: Deep approach (deep), Surface approach (surf) and strategic approach (stra). The variable attitude is a sum variable which represents the overall attitude to statistics.
+
+The aim of this analysis is to see if any of the variables are explaining the point scores of the students. To do this, we need to figure out the distributions of the variables.
+
+To see the statistics of the variables, the histograms of the answers are plotted and their distributions are plotted on top of the histograms. 
+
+
+Over 2/3 of the answers are from female students. None of the variables are following the normal distribution well enough, but especially the points variable is problematic: it's not normal enough for reliable linear modelling, but it's definitely not a binary variable or following any other generalized linear model family. To keep things simple, the gaussian linear model is applied and the fact that points variable isn't normal enough is included in the interpretation.
+
+
+```{r message = FALSE, warning=FALSE}
+library(ggplot2)
+library(cowplot)
+
+p1 <- ggplot(learn, aes(x = gender)) +
+  geom_histogram(colour="black", fill="pink", binwidth = 0.5)
+p2 <- ggplot(learn, aes(x = age)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+p3 <- ggplot(learn, aes(x = attitude)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+p4 <- ggplot(learn, aes(x = deep)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+p5 <- ggplot(learn, aes(x = stra)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+p6 <- ggplot(learn, aes(x = surf)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+p7 <- ggplot(learn, aes(x = points)) +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 2) +
+  geom_density(alpha=.2, fill="#FF6644") 
+plot_grid(p1, p2, p3, p4, p5, p6, p7)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+library(GGally)
+ggpairs(learn)
+```
+To select the three variables I cross-plot all of the variables. Correlations between points and attitude seems fine, but the rest of the variables doesn't show any signs of correlation. The distribution of the variables seems not perfectly suitable for linear modelling, which needs to be considered while interpreting the results.
+
+According to this analysis, there might be some multicollinearity present: attitude and gender correlates strongly, as are deep and surf. These effects need to be considered during the regression analysis.
+
+The visual analysis can be confirmed by selecting all the variables to the model:
+
+```{r}
+lm1 <- lm(points~gender+age+attitude+deep+stra+surf, data=learn)
+
+summary(lm1)
+```
+
+Based on both visual and linear analysis, the three variables selected are attitude, stra and age. The attitude and stra are following normal distribution better (but far from perfect) than age, which seems to follow maybe inverse chi-squared or gamma distribution.
+
+```{r}
+lm2 <- lm(points~age+attitude+stra, data=learn)
+
+summary(lm2)
+shapiro.test(lm2[['residuals']]) # check normality of the residuals
+par(mfrow=c(2,2))
+plot(lm2)
+```
+
+```{r}
+lm3 <- lm(points~attitude+stra, data=learn)
+summary(lm3)
+shapiro.test(lm3[['residuals']]) # check normality of the residuals
+par(mfrow=c(2,2))
+plot(lm3)
+```
+
+The QQ plot clearly shows the problems using linear modelling.The tails of every variable are inconvenient for linear modelling. Nonetheless, the best results are done with just one variable, attitude, in the model. 
+
+```{r}
+lm4 <- lm(points~attitude, data=learn)
+
+summary(lm4)
+shapiro.test(lm4[['residuals']]) # check normality of the residuals
+d<-density(lm4[['residuals']])
+plot(d,main='Residual KDE Plot',xlab='Residual value')
+
+par(mfrow=c(2,2))
+plot(lm4)
+```
+
+The results are varifying the first impression of attitude being the best explanatory variable for the points variable. Adding the age or strategic learning variables doesn't add any value for the models: both R^2 and F statistics are improving a little by removing these two variables, and normality test shows slight, but not significant improvement. This makes also sense: The score of stategic learning is understandably multicollinear with other learning stategies and age variable doesn't correlate with points very much. This is also intuitively correct.
+
+Attitude towards statistics, however, is quite strongly explaining test scores, which makes sense: if one is afraid of the subject at hand, the studying isn't effective. On the other hand, if student is very interested, the studying is easier and often more effective.
