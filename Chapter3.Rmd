@@ -9,4 +9,60 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## 2
+
+```{r}
+library(openxlsx)
+alc <- read.xlsx('data/pormath.xlsx')
+ls(alc)
+```
+The data includes two studies with 51 variables icluding identification information, variables describing social environment and information of alchohol use.
+
+## 3.
+
+Tha aim of the study is to find variables connected to high alcohol consumption. From the 51 variables above. First the high-use variable need to be transformed as numeric variable:
+```{r}
+alc$high_use[alc$high_use == FALSE] <- 0
+alc$high_use[alc$high_use == TRUE] <- 1
+alc$high_use <- as.integer(alc$high_use)
+```
+
+The interesting variables of my choise are jops of the parents, studytime and family relations and support. The hypothesis here is that high alcohol consumption is related to the socioeconomic status of the family and the status and interest to school are inherited. There might be several co-effects in this datasets, which makes it difficult to determine the causal effect.
+
+
+## 4.
+
+```{r}
+alc$famsup[alc$famsup == 'yes'] <- 1
+alc$famsup[alc$famsup == 'no'] <- 0
+alc$famsup <- as.integer(alc$famsup)
+```
+
+```{r}
+table(alc$high_use, alc$famsup)
+table(alc$high_use, alc$Medu)
+table(alc$high_use, alc$Fedu)
+table(alc$high_use, alc$studytime)
+table(alc$high_use, alc$famrel)
+```
+
+according to cross-table, studytime and family relations are connected to high alcohol consumption, the rest of the variables not so much.
+
+## 5.
+```{r}
+logit1 <- glm(high_use ~ Medu+Fedu+studytime+famrel+famsup, data=alc, family = 'binomial')
+summary(logit1)
+```
+
+It seems that mother's or father's education level or family support doesn't affect the alcohol consumption. In the other hand, family relations has effect on low significance, but studytime is clearly related to high alcohol consumption. This was expected, but the causality mechanism isn't clear.
+
+```{r}
+logit2 <- glm(high_use ~ studytime+famrel, data=alc, family = 'binomial')
+summary(logit2)
+
+print(c('Odds ratios: ', exp(coef(logit2))))
+```
+
+According to the odds ratios, increasing study time decreases odds of high alcohol consumption to half. increasing value family relations affect is smaller, decreasing the odds to only 3/4.
+
 
