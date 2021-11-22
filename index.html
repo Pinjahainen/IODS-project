@@ -438,6 +438,10 @@ summary {
 <li><a href="#introduction-to-open-data-science---course-project">Introduction to Open Data Science - Course Project</a></li>
 <li><a href="#about-the-project">About the project</a><ul>
 <li><a href="#week-2-regression-and-model-validation">Week 2: Regression and model validation</a></li>
+<li><a href="#section">2</a></li>
+<li><a href="#section-1">3.</a></li>
+<li><a href="#section-2">4.</a></li>
+<li><a href="#section-3">5.</a></li>
 </ul></li>
 </ul>
 </div>
@@ -451,7 +455,7 @@ summary {
 <pre class="r"><code># This is a so-called &quot;R chunk&quot; where you can write R code.
 
 date()</code></pre>
-<pre><code>## [1] &quot;Mon Nov 22 08:52:32 2021&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Nov 22 09:07:11 2021&quot;</code></pre>
 <pre class="r"><code>print(&#39;Hello, everyone!&#39;)</code></pre>
 <pre><code>## [1] &quot;Hello, everyone!&quot;</code></pre>
 <p>I found this course while looking up the MOOC pages, and the subtitle sounded interesting. I’m quite familiar with R what comes to basic statistics and data mining, but with GitHub and the overall idea of sharing data I’m a complete rookie. I’m aiming to being more comfortable in open data environments and sharing my code with others. I’m also trying to keep my R skills up, since all my other courses are done with Matlab and Python at the moment.</p>
@@ -635,6 +639,127 @@ plot(lm4)</code></pre>
 <p>The results are varifying the first impression of attitude being the best explanatory variable for the points variable. Adding the age or strategic learning variables doesn’t add any value for the models: both R^2 and F statistics are improving a little by removing these two variables, and normality test shows slight, but not significant improvement. This makes also sense: The score of stategic learning is understandably multicollinear with other learning stategies and age variable doesn’t correlate with points very much. This is also intuitively correct.</p>
 <p>Attitude towards statistics, however, is quite strongly explaining test scores, which makes sense: if one is afraid of the subject at hand, the studying isn’t effective. On the other hand, if student is very interested, the studying is easier and often more effective.</p>
 <hr />
+</div>
+<div id="section" class="section level2">
+<h2>2</h2>
+<pre class="r"><code>library(openxlsx)
+alc &lt;- read.xlsx(&#39;data/pormath.xlsx&#39;)
+ls(alc)</code></pre>
+<pre><code>##  [1] &quot;absences&quot;   &quot;absences.m&quot; &quot;absences.p&quot; &quot;activities&quot; &quot;address&quot;   
+##  [6] &quot;age&quot;        &quot;alc_use&quot;    &quot;cid&quot;        &quot;Dalc&quot;       &quot;failures&quot;  
+## [11] &quot;failures.m&quot; &quot;failures.p&quot; &quot;famrel&quot;     &quot;famsize&quot;    &quot;famsup&quot;    
+## [16] &quot;Fedu&quot;       &quot;Fjob&quot;       &quot;freetime&quot;   &quot;G1&quot;         &quot;G1.m&quot;      
+## [21] &quot;G1.p&quot;       &quot;G2&quot;         &quot;G2.m&quot;       &quot;G2.p&quot;       &quot;G3&quot;        
+## [26] &quot;G3.m&quot;       &quot;G3.p&quot;       &quot;goout&quot;      &quot;guardian&quot;   &quot;health&quot;    
+## [31] &quot;high_use&quot;   &quot;higher&quot;     &quot;id.m&quot;       &quot;id.p&quot;       &quot;internet&quot;  
+## [36] &quot;Medu&quot;       &quot;Mjob&quot;       &quot;n&quot;          &quot;nursery&quot;    &quot;paid&quot;      
+## [41] &quot;paid.m&quot;     &quot;paid.p&quot;     &quot;Pstatus&quot;    &quot;reason&quot;     &quot;romantic&quot;  
+## [46] &quot;school&quot;     &quot;schoolsup&quot;  &quot;sex&quot;        &quot;studytime&quot;  &quot;traveltime&quot;
+## [51] &quot;Walc&quot;</code></pre>
+<p>The data includes two studies with 51 variables icluding identification information, variables describing social environment and information of alchohol use.</p>
+</div>
+<div id="section-1" class="section level2">
+<h2>3.</h2>
+<p>Tha aim of the study is to find variables connected to high alcohol consumption. From the 51 variables above. First the high-use variable need to be transformed as numeric variable:</p>
+<pre class="r"><code>alc$high_use[alc$high_use == FALSE] &lt;- 0
+alc$high_use[alc$high_use == TRUE] &lt;- 1
+alc$high_use &lt;- as.integer(alc$high_use)</code></pre>
+<p>The interesting variables of my choise are jops of the parents, studytime and family relations and support. The hypothesis here is that high alcohol consumption is related to the socioeconomic status of the family and the status and interest to school are inherited. There might be several co-effects in this datasets, which makes it difficult to determine the causal effect.</p>
+</div>
+<div id="section-2" class="section level2">
+<h2>4.</h2>
+<pre class="r"><code>alc$famsup[alc$famsup == &#39;yes&#39;] &lt;- 1
+alc$famsup[alc$famsup == &#39;no&#39;] &lt;- 0
+alc$famsup &lt;- as.integer(alc$famsup)</code></pre>
+<pre class="r"><code>table(alc$high_use, alc$famsup)</code></pre>
+<pre><code>##    
+##       0   1
+##   0  94 165
+##   1  45  66</code></pre>
+<pre class="r"><code>table(alc$high_use, alc$Medu)</code></pre>
+<pre><code>##    
+##      0  1  2  3  4
+##   0  1 31 78 57 92
+##   1  2 18 18 36 37</code></pre>
+<pre class="r"><code>table(alc$high_use, alc$Fedu)</code></pre>
+<pre><code>##    
+##      0  1  2  3  4
+##   0  2 49 75 70 63
+##   1  0 24 30 27 30</code></pre>
+<pre class="r"><code>table(alc$high_use, alc$studytime)</code></pre>
+<pre><code>##    
+##       1   2   3   4
+##   0  56 128  52  23
+##   1  42  57   8   4</code></pre>
+<pre class="r"><code>table(alc$high_use, alc$famrel)</code></pre>
+<pre><code>##    
+##       1   2   3   4   5
+##   0   6   9  39 128  77
+##   1   2   9  25  52  23</code></pre>
+<p>according to cross-table, studytime and family relations are connected to high alcohol consumption, the rest of the variables not so much.</p>
+</div>
+<div id="section-3" class="section level2">
+<h2>5.</h2>
+<pre class="r"><code>logit1 &lt;- glm(high_use ~ Medu+Fedu+studytime+famrel+famsup, data=alc, family = &#39;binomial&#39;)
+summary(logit1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = high_use ~ Medu + Fedu + studytime + famrel + famsup, 
+##     family = &quot;binomial&quot;, data = alc)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4216  -0.8327  -0.7180   1.2973   2.1333  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.36683    0.65017   2.102   0.0355 *  
+## Medu         0.01058    0.14102   0.075   0.9402    
+## Fedu         0.01828    0.14231   0.128   0.8978    
+## studytime   -0.61043    0.15657  -3.899 9.67e-05 ***
+## famrel      -0.27611    0.12561  -2.198   0.0279 *  
+## famsup      -0.03781    0.24696  -0.153   0.8783    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 452.04  on 369  degrees of freedom
+## Residual deviance: 428.95  on 364  degrees of freedom
+## AIC: 440.95
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>It seems that mother’s or father’s education level or family support doesn’t affect the alcohol consumption. In the other hand, family relations has effect on low significance, but studytime is clearly related to high alcohol consumption. This was expected, but the causality mechanism isn’t clear.</p>
+<pre class="r"><code>logit2 &lt;- glm(high_use ~ studytime+famrel, data=alc, family = &#39;binomial&#39;)
+summary(logit2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = high_use ~ studytime + famrel, family = &quot;binomial&quot;, 
+##     data = alc)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4109  -0.8242  -0.7221   1.3040   2.1177  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   1.4219     0.5764   2.467   0.0136 *  
+## studytime    -0.6123     0.1542  -3.970 7.18e-05 ***
+## famrel       -0.2756     0.1257  -2.193   0.0283 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 452.04  on 369  degrees of freedom
+## Residual deviance: 429.02  on 367  degrees of freedom
+## AIC: 435.02
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>print(c(&#39;Odds ratios: &#39;, exp(coef(logit2))))</code></pre>
+<pre><code>##                             (Intercept)           studytime              famrel 
+##     &quot;Odds ratios: &quot;   &quot;4.1448217568963&quot; &quot;0.542075820198362&quot; &quot;0.759116543726991&quot;</code></pre>
+<p>According to the odds ratios, increasing study time decreases odds of high alcohol consumption to half. increasing value family relations affect is smaller, decreasing the odds to only 3/4.</p>
 <hr />
 </div>
 </div>
