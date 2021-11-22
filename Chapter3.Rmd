@@ -1,0 +1,12 @@
+---
+title: "Chapter3"
+author: "Pinja Mero"
+date: "22/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
