@@ -1,0 +1,115 @@
+---
+title: "Chapter4"
+author: "Pinja Mero"
+date: "27/11/2021"
+output: html_document
+---
+
+
+
+## Chapter 4: Clustering and classification
+
+### Analysis exercise
+
+#### 2.
+ Checking if I allready have a MASS package:
+```{r}
+a<-installed.packages()
+packages<-a[,1] 
+is.element("MASS", packages)
+```
+ 
+MASS Package exists, load the library and observe the dataset:
+```{r}
+library(MASS)
+str(Boston)
+d <- dim(Boston)
+d
+```
+
+The dataset contains 14 variables and 506 observations. It describes the socio-economic conditions in Boston by housing values of suburbs.
+
+
+#### 3.
+
+```{r message=FALSE, warning=FALSE}
+library(GGally)
+ggpairs(Boston)
+```
+
+
+Summaries:
+```{r}
+B_sum <- setNames(data.frame(matrix(ncol = 6, nrow = 0)), 
+              c('Min', '1st Qu', 'Median', 'Mean', '3rd Qu', 'Max'))     #set the empty data frame
+for(i in 1:d[2]) {                              # For-loop to create the 14 summary rows
+  new <- round(summary(Boston[,i]), digits = 2)   # Create new summary row
+  B_sum[nrow(B_sum) + 1, ] <- new                         # Append new row
+}
+row.names(B_sum) <- colnames(Boston)                  # Set row names
+B_sum
+```
+
+#### 4.
+Summary of the variables (in data frame to look a bit nicer)
+```{r}
+B_scaled <- data.frame(scale(Boston))
+
+Bsc_sum <- setNames(data.frame(matrix(ncol = 6, nrow = 0)), 
+              c('Min', '1st Qu', 'Median', 'Mean', '3rd Qu', 'Max'))     #set the empty data frame
+for(i in 1:d[2]) {                              # For-loop to create the 14 summary rows
+  new <- round(summary(B_scaled[,i]), digits = 2)   # Create new summary row
+  Bsc_sum[nrow(Bsc_sum) + 1, ] <- new                         # Append new row
+}
+row.names(Bsc_sum) <- colnames(Boston)                  # Set row names
+Bsc_sum
+```
+
+
+Catergorical criminal rate
+```{r}
+B_scaled$c_crim[B_scaled$crim <= -0.41] <- 1
+B_scaled$c_crim[B_scaled$crim > -0.41 & B_scaled$crim <= 0] <- 2
+B_scaled$c_crim[B_scaled$crim > 0 & B_scaled$crim <= 0.01] <- 3
+B_scaled$c_crim[B_scaled$crim > 0.01] <- 4
+B_scaled$crim <- NULL
+```
+
+Divide the data to train and test set:
+```{r}
+library(dplyr)
+B_train <- B_scaled %>% sample_frac(.8)
+names <- row.names(B_train)
+B_test <- B_scaled[!row.names(B_scaled) %in% names,]
+```
+
+LDA
+```{r}
+m1 <- lda(c_crim ~., data = B_train) #LDA witc clustered crime rate as target
+summary(m1)
+```
+#### 5.
+
+The LDA plot didn't work as expected, no time to fix things:
+```{r}
+plot(m1, fac=m1$fac)
+```
+Tested the function from the course page nonetheless:
+```{r}
+library(RColorBrewer)
+col <- brewer.pal(8, 'Set1')
+palette(col)
+
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.2, color = "orange", tex = 2, choices = c(1,2), lwd= 2){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads, lwd=2)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3, lwd=2.5)
+}
+par(cex.label=2, cex.lab=2, cex =1.5, mar=c(5,6,3,3))
+plot(m1, col=as.numeric(B_train$c_crim),  cex =1.5)
+lda.arrows(m1)
+```
+
