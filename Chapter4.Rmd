@@ -32,11 +32,13 @@ The dataset contains 14 variables and 506 observations. It describes the socio-e
 
 #### 3.
 
-```{r message=FALSE, warning=FALSE}
-library(GGally)
-ggpairs(Boston)
-```
 
+```{r}
+library(corrplot)
+cormat <- cor(Boston);
+corrplot(cormat, method = 'circle')
+```
+Some correlation can be observed between the variables.
 
 Summaries:
 ```{r}
