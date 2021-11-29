@@ -114,4 +114,26 @@ par(cex.label=2, cex.lab=2, cex =1.5, mar=c(5,6,3,3))
 plot(m1, col=as.numeric(B_train$c_crim),  cex =1.5)
 lda.arrows(m1)
 ```
+#### 6.
+Removing the classes from the test set and predicting the classes (didn't finish)
+```{r}
+B_test_class <- B_train
+B_test$c_crim <- NULL
+
+new_class <- predict(m1, B_test)
+
+```
+
+
+
+
+#### 7.
+
+```{r}
+Boston_scaled <- scale(Boston)
+
+library(stats)
+K4 <- kmeans(Boston_scaled, 4, iter.max = 10, nstart = 1)
+
+```
 
